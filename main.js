@@ -171,27 +171,27 @@ function main(){
     1,0,0, 1,0,0, 1,0,0, 1,0,0,
     1,0,0, 1,0,0, 1,0,0, 1,0,0,
 
-    // bagian belakang (merah)
-    0,0,1, 0,0,1, 0,0,1, 0,0,1,
-    0,0,1, 0,0,1, 0,0,1,
-    0,1,0, 0,1,0, 0,1,0, 0,1,0,
-    0,1,0, 0,1,0, 0,1,0, 0,1,0,
-    0,1,0, 0,1,0, 0,1,0, 0,1,0,
-    0,1,0, 0,1,0, 0,1,0, 0,1,0,
-    0,1,0, 0,1,0, 0,1,0, 0,1,0,
-    0,1,0, 0,1,0, 0,1,0, 0,1,0,
-    1,0,1, 1,0,1, 1,0,1, 1,0,1,
-    1,0,1, 1,0,1, 1,0,1,
+    // bagian belakang (hitam)
+    0,0,0, 0,0,0, 0,0,0, 0,0,0,
+    0,0,0, 0,0,0, 0,0,0,
+    0,0,0, 0,0,0, 0,0,0, 0,0,0,
+    0,0,0, 0,0,0, 0,0,0, 0,0,0,
+    0,0,0, 0,0,0, 0,0,0, 0,0,0,
+    0,0,0, 0,0,0, 0,0,0, 0,0,0,
+    0,0,0, 0,0,0, 0,0,0, 0,0,0,
+    0,0,0, 0,0,0, 0,0,0, 0,0,0,
+    0,0,0, 0,0,0, 0,0,0, 0,0,0,
+    0,0,0, 0,0,0, 0,0,0,
 
-    // bagian depan (kuning)
-    1,1,0, 1,1,0, 1,1,0, 1,1,0,
-    1,1,0, 1,1,0, 1,1,0,
-    0,1,0, 0,1,0, 0,1,0, 0,1,0,
-    0,1,0, 0,1,0, 0,1,0, 0,1,0,
-    0,1,0, 0,1,0, 0,1,0, 0,1,0,
-    0,1,0, 0,1,0, 0,1,0, 0,1,0,
-    0,1,0, 0,1,0, 0,1,0, 0,1,0,
-    0,1,0, 0,1,0, 0,1,0, 0,1,0,
+    // bagian depan (transparan)
+    0,1,1, 0,1,1, 0,1,1, 0,1,1,
+    0,1,1, 0,1,1, 0,1,1,
+    0,1,1, 0,1,1, 0,1,1, 0,1,1,
+    0,1,1, 0,1,1, 0,1,1, 0,1,1,
+    0,1,1, 0,1,1, 0,1,1, 0,1,1,
+    0,1,1, 0,1,1, 0,1,1, 0,1,1,
+    0,1,1, 0,1,1, 0,1,1, 0,1,1,
+    0,1,1, 0,1,1, 0,1,1, 0,1,1,
     0,1,1, 0,1,1, 0,1,1, 0,1,1,
     0,1,1, 0,1,1, 0,1,1,
   ];
@@ -294,42 +294,55 @@ function main(){
   
   var projmatrix = glMatrix.mat4.create();
   glMatrix.mat4.perspective(
-      projmatrix,
-      glMatrix.glMatrix.toRadian(90),     //sudut fov
-      1.0,    //aspect ratio
-      0.5,    //zmin
-      10.0    //zmax
+    projmatrix,
+    glMatrix.glMatrix.toRadian(90),     //sudut fov
+    1.0,    //aspect ratio
+    0.5,    //zmin
+    10.0    //zmax
   );
   var modmatrix = glMatrix.mat4.create();
   var viewmatrix = glMatrix.mat4.create();
   glMatrix.mat4.lookAt(
-      viewmatrix,
-      [0.0, 0.0, 2.0],    //posisi kamera positif z 2
-      [0.0, 0.0, -2.0],   //kemana kamera menghadap
-      [0.0, 1.0, 0.0]     //arah atas kamera
+    viewmatrix,
+    [0.0, 0.0, 2.0],    //posisi kamera positif z 2
+    [0.0, 0.0, -2.0],   //kemana kamera menghadap
+    [0.0, 1.0, 0.0]     //arah atas kamera
   );
 
   var freeze = false;
   function onMouseClick(event){
-      if(freeze) freeze = false;
-      else freeze = true;
+    if (freeze) freeze = false;
+    else freeze = true;
   }
   document.addEventListener('click', onMouseClick, false);
 
   function onKeyDown(event){
-      if(event.keyCode == 32) freeze = true;
+    if (event.keyCode == 32) freeze = true;
   }
   function onKeyUp(event){
-      if(event.keyCode == 32) freeze = false;
+    if (event.keyCode == 32) freeze = false;
   }
   document.addEventListener('keydown', onKeyDown, false);
   document.addEventListener('keyup', onKeyUp, false);
 
-  var theta = glMatrix.glMatrix.toRadian(1);    
+  function rotateZ(m, angle) {
+    var c = Math.cos(angle);
+    var s = Math.sin(angle);
+    var mv0 = m[0], mv4 = m[4], mv8 = m[8]; 
+
+    m[0] = c*m[0]-s*m[1];
+    m[4] = c*m[4]-s*m[5];
+    m[8] = c*m[8]-s*m[9];
+    m[1] = c*m[1]+s*mv0;
+    m[5] = c*m[5]+s*mv4;
+    m[9] = c*m[9]+s*mv8;
+  }
+
+  var theta = glMatrix.glMatrix.toRadian(0.3);
   var animate = function(){
-      // if(!freeze){
-      //     glMatrix.mat4.rotate(modmatrix, modmatrix, theta, [1,1,1]);
-      // }
+      if (!freeze) {
+        glMatrix.mat4.rotate(modmatrix, modmatrix, theta, [0,1,0]);
+      }
       
       gl.enable(gl.DEPTH_TEST);
       gl.depthFunc(gl.LEQUAL);
